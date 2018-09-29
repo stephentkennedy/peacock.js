@@ -1,7 +1,7 @@
 # peacock.js
 An in progress Canvas based 2D graphics library with some built in game logic.
 
-Currently the main render.js includes most of the graphics logic, and what little game logic (player control of an avatar, box collision, basic bounce physics)
+Currently the main render.js includes most of the graphics logic, and what little game logic (player control of an avatar, box collision, basic bounce physics) is contained in the index.html demo document.
 
 # Currently Supported Features:
 1. Offscreen object culling. The render loop works by calculating position first, and then drawing, by only drawing those objects in view the loop attempts to optimize the render process (keeping us close to 60 frames per second)
