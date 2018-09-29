@@ -1,0 +1,258 @@
+<html>
+	<head>
+		<script type="text/javascript" src="render.js"></script>
+		<style>
+			*{
+				margin: 0;
+				padding: 0;
+				box-sizing: border-box;
+			}
+		</style>
+	</head>
+	<body id="screen">
+		<script type="text/javascript">
+			var galaxy = {
+				src: 'resources/hubble.jpg',
+				x: 0,
+				y: 0,
+				width: 3079,
+				height: 1879,
+				sprite: new Image()
+			};
+			var sphere = {
+				src: 'resources/crate.png',
+				x: 100,
+				y: 250,
+				width: 188,
+				height: 188,
+				rotate: 0,
+				rSpd: 4,
+				xSpd: 4,
+				ySpd: 25,
+				sprite: new Image()
+			};
+			var player = {
+				src: 'resources/sphere.gif',
+				x: 300,
+				y: 300,
+				width: 300,
+				height: 300,
+				sprite: new Image(),
+				xSpd: 0,
+				ySpd: 0,
+				rSpd: 0,
+				rotate: 0,
+			};
+			var fire = {
+				src1: 'resources/fire1.png',
+				src2: 'resources/fire2.png',
+				src3: 'resources/fire3.png',
+				x: 600,
+				y: 250,
+				width: 64,
+				height: 182,
+				sprite: [
+					new Image(),
+					new Image(),
+					new Image(),
+					new Image(),
+					new Image(),
+					new Image(),
+					new Image(),
+					new Image(),
+					new Image(),
+					new Image(),
+					new Image(),
+					new Image(),
+					new Image(),
+					new Image(),
+					new Image(),
+					new Image(),
+					new Image(),
+					new Image(),
+					new Image(),
+					new Image(),
+					new Image(),
+					new Image(),
+					new Image(),
+					new Image(),
+					new Image(),
+					new Image(),
+					new Image(),
+					new Image(),
+					new Image(),
+					new Image(),
+					new Image(),
+					new Image()
+				],
+				sC: 0,
+				frames: setInterval(function(){
+					fire.sC++;
+					if(fire.sC >= fire.sprite.length){
+						fire.sC = 0;
+					}
+				}, 33)
+			};
+			for(i in fire.sprite){
+				var name = 'resources/tile0';
+				if(i < 10){
+					name += '0';
+				}
+				name += i + '.png';
+				fire.sprite[i].src = name;
+			}
+			player.sprite.src = player.src;
+			galaxy.sprite.src = galaxy.src;
+			sphere.sprite.src = sphere.src;
+			var dir = true;
+			var diry = true;
+			
+			//This should be moved into the game logic as a rudamentary box based physics engine.
+			function move(){
+				var xSpeed = sphere.xSpd;
+				var ySpeed = sphere.ySpd;
+				var rSpeed = sphere.rSpd;
+				var xPos = 0;
+				var yPos = 0;
+				if(xSpeed < 0.5){
+					sphere.xSpd = 0;
+				}
+				if(ySpeed < 0.5){
+					sphere.ySpd = 0;
+				}
+				if(dir == true){
+					if((sphere.x + xSpeed) <= (galaxy.width - sphere.width) ){
+						xPos = sphere.x + xSpeed;
+					}else{
+						dir = false;
+						if(diry == true && sphere.rSpd > 0 || diry == false && sphere.rSpd < 0){
+							sphere.rSpd = sphere.rSpd * .75;
+							sphere.rSpd = -1 * sphere.rSpd;
+						}else{
+							sphere.rSpd = sphere.rSpd * 1.05;
+						}
+						sphere.xSpd = xSpeed * .85;
+						xSpeed = sphere.xSpd;
+						xPos = sphere.x - xSpeed;
+					}
+				}else{
+					if((sphere.x - xSpeed) > 0 ){
+						xPos = sphere.x - xSpeed;
+					}else{
+						dir = true;
+						if(diry == false && sphere.rSpd > 0 || diry == true && sphere.rSpd < 0){
+							sphere.rSpd = sphere.rSpd * .75;
+							sphere.rSpd = -1 * sphere.rSpd;
+						}else{
+							sphere.rSpd = sphere.rSpd * 1.05;
+						}
+						sphere.xSpd = xSpeed * .85;
+						xSpeed = sphere.xSpd;
+						xPos = sphere.x + xSpeed;
+					}
+				}
+				if(diry == true){
+					if((sphere.y + ySpeed) <= (galaxy.height - sphere.height) ){
+						yPos = sphere.y + ySpeed;
+					}else{
+						diry = false;
+						if(dir == false && sphere.rSpd > 0 || dir == true && sphere.rSpd < 0){
+							sphere.rSpd = sphere.rSpd * .75;
+							sphere.rSpd = -1 * sphere.rSpd;
+						}else{
+							sphere.rSpd = sphere.rSpd * 1.05;
+						}
+						sphere.ySpd = ySpeed * .85;
+						ySpeed = sphere.ySpd;
+						yPos = sphere.y - ySpeed;
+					}
+				}else{
+					if((sphere.y - ySpeed) > 0 ){
+						yPos = sphere.y - ySpeed;
+					}else{
+						diry = true;
+						if(dir == true && sphere.rSpd > 0 || dir == false && sphere.rSpd < 0){
+							sphere.rSpd = sphere.rSpd * .75;
+							sphere.rSpd = -1 * sphere.rSpd;
+						}else{
+							sphere.rSpd = sphere.rSpd * 1.05;
+						}
+						sphere.ySpd = ySpeed * .85;
+						ySpeed = sphere.ySpd;
+						yPos = sphere.y + ySpeed;
+					}
+				}
+				if(rSpeed != undefined){
+					var newRotate = sphere.rotate + (rSpeed * (Math.PI / 180));
+					if(newRotate > ( 360 * (Math.PI / 180))){
+						newRotate = newRotate - ( 360 * (Math.PI / 180));
+					}else if(newRotate < 0){
+						newRotate = newRotate + ( 360 * (Math.PI / 180));
+					}
+					sphere.rotate = newRotate;
+				}
+				sphere.x = xPos;
+				sphere.y = yPos;
+			}
+			r.renderLoop.push(move);
+			r.renderLoop.push(function(){
+				r.lockFrame(player);
+			});
+			r.obj.push(galaxy);
+			r.obj.push(fire);
+			r.obj.push(player);
+			r.obj.push(sphere);
+			
+			window.onkeydown = function(e){
+				switch(e.keyCode){
+					case 38: //Up Arrow
+						player.ySpd = -8;
+						break;
+					case 40: // Down Arrow
+						player.ySpd = 8;
+						break;
+					case 37: // Left Arrow
+						player.xSpd = -8;
+						break;
+					case 39: //Right Arrow
+						player.xSpd = 8;
+						break;
+				}
+			}
+			window.onkeyup = function(e){
+				switch(e.keyCode){
+					case 38: //Up Arrow
+					case 40: // Down Arrow
+						player.ySpd = 0;
+						break;
+					case 37: // Left Arrow
+					case 39: //Right Arrow
+						player.xSpd = 0;
+						break;
+					}
+			}
+			function movePlayer(){
+				var xSpeed = player.xSpd;
+				var ySpeed = player.ySpd;
+				var xPos = 0;
+				var yPos = 0;
+				if((player.x + xSpeed) <= (galaxy.width - player.width) && (player.x + xSpeed) > 0 ){
+					xPos = player.x + xSpeed;
+				}else{
+					xPos = player.x;
+				}
+				if((player.y + ySpeed) <= (galaxy.height - player.height) && (player.y + ySpeed) > 0 ){
+					yPos = player.y + ySpeed;
+				}else{
+					yPos = player.y;
+				}
+				player.x = xPos;
+				player.y = yPos;
+			}
+			r.renderLoop.push(movePlayer);
+			window.addEventListener('load', function(){
+				r.init('screen');
+			});
+		</script>
+	</body>
+</html>
